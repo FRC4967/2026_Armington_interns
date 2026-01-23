@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
   //private final SparkMax armAngle = new SparkMax(, MotorType.kBrushless);
   //private final SparkMax armExtension = new SparkMax(, MotorType.kBrushless);
   //private final SparkMax armRotation = new SparkMax(, MotorType.kBrushless);
-  private final Joystick m_stick = new Joystick(0);
+  private final Joystick stick = new Joystick(0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the X turns left and right.
-    container.arcadeDrive(m_stick.getX(), -m_stick.getY());
+    container.arcadeDrive(stick.getX(), -stick.getY());
   }
   @Override
   public void disabledPeriodic() {
