@@ -8,11 +8,13 @@ public class DefaultArmCommand extends Command{
 
     private final Arm arm; 
     private Supplier <Double> extensionSupplier;
+    private Supplier <Double> angleSupplier;
     
     
-    public DefaultArmCommand(Arm arm, Supplier<Double> extensionSupplier) {
+    public DefaultArmCommand(Arm arm, Supplier<Double> extensionSupplier, Supplier<Double> angleSupplier) {
         this.arm = arm;
         this.extensionSupplier = extensionSupplier;
+        this.angleSupplier = angleSupplier;
         addRequirements(arm);
     }
 
@@ -20,6 +22,7 @@ public class DefaultArmCommand extends Command{
     @Override
     public void execute() {
         arm.extendTo(extensionSupplier.get());
+        arm.shoulderToManualControl(-angleSupplier.get());
     }
 
     
