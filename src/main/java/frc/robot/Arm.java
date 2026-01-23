@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogEncoder;
@@ -24,10 +25,11 @@ public class Arm extends SubsystemBase {
     private final SparkMax armExtension = new SparkMax(6, MotorType.kBrushless);
     private final SparkMax armAngle = new SparkMax(5, MotorType.kBrushless);
     private final RelativeEncoder armExtensionEncoder;
-    private final AnalogPotentiometer armAngleEncoder = new AnalogPotentiometer(0,325.7, -167.2);
+    private final AnalogPotentiometer armAngleEncoder = new AnalogPotentiometer(0,325.7, -167.7);
     // private final SparkMax armRotation = new SparkMax(, MotorType.kBrushless);
     PIDController extensionPID = new PIDController(1, 0, 0);
     PIDController anglePID = new PIDController(1, 0, 0);
+    private final ArmFeedforward armFeedforward = new ArmFeedforward(0, .25, 0);
 
     public Arm() {
         SparkMaxConfig armConfig = new SparkMaxConfig();
@@ -53,6 +55,20 @@ public class Arm extends SubsystemBase {
             armExtension.setVoltage(armVoltage);
         }
     }
+    
+    /*public void shoulderToPosition(double shoulderPosition) {
+        
+        feedForward = armFeedforward.calculate(
+                Math.toRadians(shoulderPosition),
+                Math.toRadians(ArmConstants.SHOULDER_MAX_VELOCITY),
+                Math.toRadians(ArmConstants.SHOULDER_MAX_ACCEL));
+        feedBack = shoulderPidController.calculate(armPot.get(), potAngleToTics(shoulderPosition));
+        double outputVolts = MathUtil.clamp(feedForward + feedBack, - ArmConstants.SHOULDER_MAX_VOLTS, ArmConstants.SHOULDER_MAX_VOLTS);
+        shoulderMotor.setVoltage(outputVolts);
+
+        
+    }*/
+
     public void extendTo(double percentage){
         percentage += 1;
         double extensionSetpoint = percentage*250;
@@ -61,10 +77,12 @@ public class Arm extends SubsystemBase {
         }
         extensionPID.setSetpoint(extensionSetpoint);
     }
-    public void tiltTo(double percentage){
-        percentage += 1;
+    public void shoulderToManualControl(double percentage){
+        double rawAngle = (armAngleEncoder.get() * 6)+90;
+        double armGain = armFeedforward.calculate(Math.toRadians(rawAngle), 0);
+        armAngle.setVoltage(armGain + percentage);
         
-        //anglePID.setSetpoint(angleSetpoint);
+
     }
     private double potTicsToAngle(double tics) {
         return (tics * 360) / 64;
