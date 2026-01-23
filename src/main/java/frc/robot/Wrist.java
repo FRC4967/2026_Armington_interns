@@ -8,14 +8,22 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Claw extends SubsystemBase {
+public class Wrist extends SubsystemBase {
     private final SparkMax clawRotationMotor = new SparkMax(7, MotorType.kBrushless);
 
-    Claw() {
+    Wrist() {
         SparkMaxConfig clawRotationConfig = new SparkMaxConfig();
 
         clawRotationMotor.configure(clawRotationConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    }
 
+    public void runWrist(boolean up, boolean down){
+        if (up == true){
+            clawRotationMotor.setVoltage(1);
+        }
+        if (down == true){
+            clawRotationMotor.setVoltage(-1);
+        }
     }
 }

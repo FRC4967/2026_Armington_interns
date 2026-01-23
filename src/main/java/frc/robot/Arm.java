@@ -25,7 +25,7 @@ public class Arm extends SubsystemBase {
     private final SparkMax armExtension = new SparkMax(6, MotorType.kBrushless);
     private final SparkMax armAngle = new SparkMax(5, MotorType.kBrushless);
     private final RelativeEncoder armExtensionEncoder;
-    private final AnalogPotentiometer armAngleEncoder = new AnalogPotentiometer(0,325.7, -167.7);
+    private final AnalogPotentiometer armAngleEncoder = new AnalogPotentiometer(0, 325.7, -167.7);
     // private final SparkMax armRotation = new SparkMax(, MotorType.kBrushless);
     PIDController extensionPID = new PIDController(1, 0, 0);
     PIDController anglePID = new PIDController(1, 0, 0);
@@ -55,35 +55,40 @@ public class Arm extends SubsystemBase {
             armExtension.setVoltage(armVoltage);
         }
     }
-    
-    /*public void shoulderToPosition(double shoulderPosition) {
-        
-        feedForward = armFeedforward.calculate(
-                Math.toRadians(shoulderPosition),
-                Math.toRadians(ArmConstants.SHOULDER_MAX_VELOCITY),
-                Math.toRadians(ArmConstants.SHOULDER_MAX_ACCEL));
-        feedBack = shoulderPidController.calculate(armPot.get(), potAngleToTics(shoulderPosition));
-        double outputVolts = MathUtil.clamp(feedForward + feedBack, - ArmConstants.SHOULDER_MAX_VOLTS, ArmConstants.SHOULDER_MAX_VOLTS);
-        shoulderMotor.setVoltage(outputVolts);
 
-        
-    }*/
+    /*
+     * public void shoulderToPosition(double shoulderPosition) {
+     * 
+     * feedForward = armFeedforward.calculate(
+     * Math.toRadians(shoulderPosition),
+     * Math.toRadians(ArmConstants.SHOULDER_MAX_VELOCITY),
+     * Math.toRadians(ArmConstants.SHOULDER_MAX_ACCEL));
+     * feedBack = shoulderPidController.calculate(armPot.get(),
+     * potAngleToTics(shoulderPosition));
+     * double outputVolts = MathUtil.clamp(feedForward + feedBack, -
+     * ArmConstants.SHOULDER_MAX_VOLTS, ArmConstants.SHOULDER_MAX_VOLTS);
+     * shoulderMotor.setVoltage(outputVolts);
+     * 
+     * 
+     * }
+     */
 
-    public void extendTo(double percentage){
+    public void extendTo(double percentage) {
         percentage += 1;
-        double extensionSetpoint = percentage*250;
-        if(extensionSetpoint > 250){
-            extensionSetpoint =250;
+        double extensionSetpoint = percentage * 250;
+        if (extensionSetpoint > 250) {
+            extensionSetpoint = 250;
         }
         extensionPID.setSetpoint(extensionSetpoint);
     }
-    public void shoulderToManualControl(double percentage){
-        double rawAngle = (armAngleEncoder.get() * 6)+90;
+
+    public void shoulderToManualControl(double percentage) {
+        double rawAngle = (armAngleEncoder.get() * 6) + 90;
         double armGain = armFeedforward.calculate(Math.toRadians(rawAngle), 0);
         armAngle.setVoltage(armGain + percentage);
-        
 
     }
+
     private double potTicsToAngle(double tics) {
         return (tics * 360) / 64;
     }
