@@ -90,7 +90,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void shoulderToManualControl(double percentage) {
-            double newAngleSetpoint = anglePID.getSetpoint() + percentage;
+        double newAngleSetpoint = anglePID.getSetpoint() + percentage;
         anglePID.setSetpoint(newAngleSetpoint);
     }
 
