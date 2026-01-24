@@ -21,7 +21,8 @@ public class Claw extends SubsystemBase {
     public Claw() {
         SparkMaxConfig clawRotationConfig = new SparkMaxConfig();
 
-        clawRotationMotor.configure(clawRotationConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        claw
+        RotationMotor.configure(clawRotationConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         wristEncoder = clawRotationMotor.getEncoder();
     }
