@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-
+    //double angleSetpoint = 0;
     // private final SparkMax armAngle = new SparkMax(, MotorType.kBrushless);
     private final SparkMax armExtension = new SparkMax(6, MotorType.kBrushless);
     private final SparkMax armAngle = new SparkMax(5, MotorType.kBrushless);
@@ -28,7 +28,7 @@ public class Arm extends SubsystemBase {
     private final AnalogPotentiometer armAngleEncoder = new AnalogPotentiometer(0, 325.7, -167.7);
     // private final SparkMax armRotation = new SparkMax(, MotorType.kBrushless);
     PIDController extensionPID = new PIDController(1, 0, 0);
-    PIDController anglePID = new PIDController(1, 0, 0);
+    PIDController anglePID = new PIDController(.45, 0, 0);
     private final ArmFeedforward armFeedforward = new ArmFeedforward(0, .25, 0);
 
     public Arm() {
@@ -45,14 +45,20 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double rawAngle = armAngleEncoder.get() * 6;
+        double rawAngle = getArmAngle();
         SmartDashboard.putNumber("Ext. Position", armExtensionEncoder.getPosition());
+        SmartDashboard.putNumber("Ext. Setpoint", extensionPID.getSetpoint());
         SmartDashboard.putNumber("Raw Angle", rawAngle);
+        SmartDashboard.putNumber("Target Angle", anglePID.getSetpoint());
         if (RobotState.isEnabled()) {
             // double elevatorFeedForward = feedforward.calculate(0);
             double armFeedback = extensionPID.calculate(armExtensionEncoder.getPosition());
             double armVoltage = MathUtil.clamp(armFeedback, -4, 4);
             armExtension.setVoltage(armVoltage);
+            double armAngleFeedback = anglePID.calculate(rawAngle);
+            double armGain = armFeedforward.calculate(Math.toRadians(rawAngle), 0);
+            double armAngleVoltage = MathUtil.clamp(armAngleFeedback + armGain, -12, 12);
+            armAngle.setVoltage(armAngleVoltage);
         }
     }
 
@@ -75,6 +81,7 @@ public class Arm extends SubsystemBase {
 
     public void extendTo(double percentage) {
         percentage += 1;
+        percentage = percentage / 2;
         double extensionSetpoint = percentage * 250;
         if (extensionSetpoint > 250) {
             extensionSetpoint = 250;
@@ -87,10 +94,19 @@ public class Arm extends SubsystemBase {
         double armGain = armFeedforward.calculate(Math.toRadians(rawAngle), 0);
         armAngle.setVoltage(armGain + percentage);
 
+    public void shoulderToManualControl(double percentage) {
+    // angleSetpoint = anglePID.getSetpoint();
+        double newAngleSetpoint = anglePID.getSetpoint() + percentage;
+        anglePID.setSetpoint(newAngleSetpoint);
     }
 
     private double potTicsToAngle(double tics) {
         return (tics * 360) / 64;
+    }
+
+    public double getArmAngle() {
+        double rawAngle = (armAngleEncoder.get() * 6);
+        return rawAngle;
     }
 }
 /*
