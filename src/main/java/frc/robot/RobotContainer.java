@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 public class RobotContainer {
     public DriveTrain drivetrain = new DriveTrain();
     public Arm arm = new Arm();
-    public Wrist wrist = new Wrist();
+    public Claw wrist = new Claw();
     private CommandJoystick joystick = new CommandJoystick(0);
     private CommandJoystick joystick2 = new CommandJoystick(1);
 

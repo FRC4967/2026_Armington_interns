@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Wrist extends SubsystemBase {
+public class Claw extends SubsystemBase {
     private final SparkMax clawRotationMotor = new SparkMax(7, MotorType.kBrushless);
     private final RelativeEncoder wristEncoder;
     private final PIDController wristPid = new PIDController(.25, 0, 0);
 
-    public Wrist() {
+    public Claw() {
         SparkMaxConfig clawRotationConfig = new SparkMaxConfig();
 
         clawRotationMotor.configure(clawRotationConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -26,7 +26,7 @@ public class Wrist extends SubsystemBase {
         wristEncoder = clawRotationMotor.getEncoder();
     }
 
-    public void runWrist(boolean up, boolean down) {
+    public void runClaw(boolean up, boolean down) {
         if (up == true) {
             clawRotationMotor.setVoltage(1);
         } else if (down == true) {
@@ -36,7 +36,7 @@ public class Wrist extends SubsystemBase {
         }
     }
 
-    public void wristGoTo(int position){
+    public void ClawGoTo(int position){
         wristPid.setSetpoint(MathUtil.clamp(position, -62, 37));
     }
     @Override
