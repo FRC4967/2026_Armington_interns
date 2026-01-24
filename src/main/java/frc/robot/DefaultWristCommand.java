@@ -19,7 +19,7 @@ public class DefaultWristCommand extends Command {
 
     @Override
     public void execute() {
-        wrist.runWrist(upSupplier.get(), downSupplier.get());
+        wrist.runClaw(upSupplier.get(), downSupplier.get());
 
     }
 
