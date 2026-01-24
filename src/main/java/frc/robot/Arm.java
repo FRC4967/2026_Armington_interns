@@ -90,9 +90,8 @@ public class Arm extends SubsystemBase {
     }
 
     public void shoulderToManualControl(double percentage) {
-        double rawAngle = (armAngleEncoder.get() * 6) + 90;
-        double armGain = armFeedforward.calculate(Math.toRadians(rawAngle), 0);
-        armAngle.setVoltage(armGain + percentage);
+        double newAngleSetpoint = anglePID.getSetpoint() + percentage;
+        anglePID.setSetpoint(newAngleSetpoint);
     }
 
     private double potTicsToAngle(double tics) {
