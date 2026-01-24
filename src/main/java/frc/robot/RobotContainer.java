@@ -18,6 +18,11 @@ public class RobotContainer {
         arm.setDefaultCommand(new DefaultArmCommand(arm, () -> joystick2.getRawAxis(3), () -> joystick2.getRawAxis(1)));
         claw.setDefaultCommand(new DefaultWristCommand(claw, () -> joystick2.povUp().getAsBoolean(), () -> joystick2.povDown().getAsBoolean()));
         gripper.setDefaultCommand(new DefaultGripperCommand(gripper, () -> joystick2.button(1).getAsBoolean()));
+        configureBindings();
+    }
+
+    private void configureBindings(){
+        joystick2.button(2).onTrue(new ResetButton(arm, claw));
     }
     
 }
