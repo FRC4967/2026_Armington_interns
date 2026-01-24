@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class DefaultArmCommand extends Command{
@@ -21,8 +22,9 @@ public class DefaultArmCommand extends Command{
 
     @Override
     public void execute() {
-        arm.extendTo(extensionSupplier.get());
-        arm.shoulderToManualControl(-angleSupplier.get());
+        double angleDeadband = MathUtil.applyDeadband(angleSupplier.get(), .1); 
+        arm.extendTo(-extensionSupplier.get());
+        arm.shoulderToManualControl(-angleDeadband);
     }
 
     
