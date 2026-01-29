@@ -17,6 +17,7 @@ public class Claw extends SubsystemBase {
     private final SparkMax clawRotationMotor = new SparkMax(7, MotorType.kBrushless);
     private final RelativeEncoder wristEncoder;
     private final PIDController wristPid = new PIDController(.25, 0, 0);
+    private double clawSetpoint = 0;
 
     public Claw() {
         SparkMaxConfig clawRotationConfig = new SparkMaxConfig();
@@ -24,26 +25,37 @@ public class Claw extends SubsystemBase {
         wristEncoder = clawRotationMotor.getEncoder();
     }
 
+    // public void runClaw(boolean up, boolean down) {
+    //     if (up == true) {
+    //         clawRotationMotor.setVoltage(1);
+    //     } else if (down == true) {
+    //         clawRotationMotor.setVoltage(-1);
+    //     } else {
+    //         clawRotationMotor.setVoltage();
+    //     }
+    // }
     public void runClaw(boolean up, boolean down) {
-        if (up == true) {
-            clawRotationMotor.setVoltage(1);
-        } else if (down == true) {
-            clawRotationMotor.setVoltage(-1);
-        } else {
-            clawRotationMotor.setVoltage(0);
-        }
-    }
+      if (up == true) {
+        clawSetpoint += 1;
+      }
+      else if (down == true) {
+        clawSetpoint -= 1;
+      } 
+      ClawGoTo(clawSetpoint);
+    } 
 
-    public void ClawGoTo(int position){
-        wristPid.setSetpoint(MathUtil.clamp(position, -62, 37));
+    public void ClawGoTo(double position){
+        clawSetpoint = MathUtil.clamp(position, -62, 37);
+        wristPid.setSetpoint(clawSetpoint);
     }
+    
     @Override
     public void periodic() {
        SmartDashboard.putNumber("wristAngle", wristEncoder.getPosition());
 
        if(RobotState.isEnabled()) {
             double clawVoltage = wristPid.calculate(wristEncoder.getPosition());
-            clawRotationMotor.setVoltage(0);
+            clawRotationMotor.setVoltage(clawVoltage);
        }
     }
     

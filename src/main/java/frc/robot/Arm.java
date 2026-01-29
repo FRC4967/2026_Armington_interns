@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-    //double angleSetpoint = 0;
+    // double angleSetpoint = 0;
     // private final SparkMax armAngle = new SparkMax(, MotorType.kBrushless);
     private final SparkMax armExtension = new SparkMax(6, MotorType.kBrushless);
     private final SparkMax armAngle = new SparkMax(5, MotorType.kBrushless);
@@ -30,6 +30,7 @@ public class Arm extends SubsystemBase {
     PIDController extensionPID = new PIDController(1, 0, 0);
     PIDController anglePID = new PIDController(.45, 0, 0);
     private final ArmFeedforward armFeedforward = new ArmFeedforward(0, .25, 0);
+    private double extensionSetpoint = 0;
 
     public Arm() {
         SparkMaxConfig armConfig = new SparkMaxConfig();
@@ -48,6 +49,7 @@ public class Arm extends SubsystemBase {
         double rawAngle = getArmAngle();
         SmartDashboard.putNumber("Ext. Position", armExtensionEncoder.getPosition());
         SmartDashboard.putNumber("Ext. Setpoint", extensionPID.getSetpoint());
+        SmartDashboard.putNumber("Ext. Setpoint2", extensionSetpoint);
         SmartDashboard.putNumber("Raw Angle", rawAngle);
         SmartDashboard.putNumber("Target Angle", anglePID.getSetpoint());
         if (RobotState.isEnabled()) {
@@ -78,20 +80,31 @@ public class Arm extends SubsystemBase {
      * 
      * }
      */
-
-    public void extendTo(double percentage) {
-        percentage += 1;
-        percentage = percentage / 2;
-        double extensionSetpoint = percentage * 250;
-        if (extensionSetpoint > 250) {
-            extensionSetpoint = 250;
+    public void runExtension(boolean up, boolean down) {
+        if (up) {
+            extensionSetpoint += 1;
+            extendTo(extensionSetpoint);
+        } else if (down) {
+            extensionSetpoint -= 1;
+            extendTo(extensionSetpoint);
         }
+    }
+
+    public void extendTo(double position) {
+        double extensionSetpoint = position;
+        extensionSetpoint = MathUtil.clamp(extensionSetpoint, 0, 250);
         extensionPID.setSetpoint(extensionSetpoint);
     }
 
-    public void shoulderToManualControl(double percentage) {
+    public void setArmAngleRelative(double percentage) {
         double newAngleSetpoint = anglePID.getSetpoint() + percentage;
-        anglePID.setSetpoint(newAngleSetpoint);
+        setArmAngle(newAngleSetpoint);
+    }
+
+    public void setArmAngle(double degrees) {
+        if (degrees > -179 || degrees < 175) {
+            anglePID.setSetpoint(degrees);
+        }
     }
 
     private double potTicsToAngle(double tics) {
