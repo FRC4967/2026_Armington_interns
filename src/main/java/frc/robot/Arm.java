@@ -3,6 +3,7 @@ package frc.robot;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -25,13 +26,14 @@ public class Arm extends SubsystemBase {
     private final SparkMax armExtension = new SparkMax(6, MotorType.kBrushless);
     private final SparkMax armAngle = new SparkMax(5, MotorType.kBrushless);
     private final RelativeEncoder armExtensionEncoder;
+    private final SparkLimitSwitch armExtensionRetractedSwitch;
     private final AnalogPotentiometer armAngleEncoder = new AnalogPotentiometer(0, 325.7, -167.7);
     // private final SparkMax armRotation = new SparkMax(, MotorType.kBrushless);
     PIDController extensionPID = new PIDController(1, 0, 0);
     PIDController anglePID = new PIDController(.45, 0, 0);
     private final ArmFeedforward armFeedforward = new ArmFeedforward(0, .25, 0);
+    private boolean isHoming = false;
     private double extensionSetpoint = 0;
-
     public Arm() {
         SparkMaxConfig armConfig = new SparkMaxConfig();
         SparkMaxConfig armAngleConfig = new SparkMaxConfig();
@@ -40,6 +42,7 @@ public class Arm extends SubsystemBase {
         armAngle.configure(armAngleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         armExtension.configure(armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         armExtensionEncoder = armExtension.getEncoder();
+        armExtensionRetractedSwitch = armExtension.getReverseLimitSwitch();
         extensionPID.setSetpoint(0);
         anglePID.setSetpoint(0);
     }
@@ -51,35 +54,29 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Ext. Setpoint", extensionPID.getSetpoint());
         SmartDashboard.putNumber("Ext. Setpoint2", extensionSetpoint);
         SmartDashboard.putNumber("Raw Angle", rawAngle);
+        SmartDashboard.putBoolean("Stop Switch", isArmRetracted());
         SmartDashboard.putNumber("Target Angle", anglePID.getSetpoint());
         if (RobotState.isEnabled()) {
             // double elevatorFeedForward = feedforward.calculate(0);
             double armFeedback = extensionPID.calculate(armExtensionEncoder.getPosition());
             double armVoltage = MathUtil.clamp(armFeedback, -4, 4);
-            armExtension.setVoltage(armVoltage);
             double armAngleFeedback = anglePID.calculate(rawAngle);
             double armGain = armFeedforward.calculate(Math.toRadians(rawAngle), 0);
             double armAngleVoltage = MathUtil.clamp(armAngleFeedback + armGain, -12, 12);
             armAngle.setVoltage(armAngleVoltage);
+            if (isHoming) {
+                if(armExtensionRetractedSwitch.isPressed()) {
+                    armExtension.setVoltage(0);
+                    isHoming = false;
+                    armExtensionEncoder.setPosition(0);
+                } else {
+                     armExtension.setVoltage(-3);
+                }
+            } else {
+                armExtension.setVoltage(armVoltage);
+            }
         }
     }
-
-    /*
-     * public void shoulderToPosition(double shoulderPosition) {
-     * 
-     * feedForward = armFeedforward.calculate(
-     * Math.toRadians(shoulderPosition),
-     * Math.toRadians(ArmConstants.SHOULDER_MAX_VELOCITY),
-     * Math.toRadians(ArmConstants.SHOULDER_MAX_ACCEL));
-     * feedBack = shoulderPidController.calculate(armPot.get(),
-     * potAngleToTics(shoulderPosition));
-     * double outputVolts = MathUtil.clamp(feedForward + feedBack, -
-     * ArmConstants.SHOULDER_MAX_VOLTS, ArmConstants.SHOULDER_MAX_VOLTS);
-     * shoulderMotor.setVoltage(outputVolts);
-     * 
-     * 
-     * }
-     */
     public void runExtension(boolean up, boolean down) {
         if (up) {
             extensionSetpoint += 1;
@@ -90,11 +87,11 @@ public class Arm extends SubsystemBase {
         }
     }
 
-    public void extendTo(double position) {
+       public void extendTo(double position) {
         double extensionSetpoint = position;
         extensionSetpoint = MathUtil.clamp(extensionSetpoint, 0, 250);
         extensionPID.setSetpoint(extensionSetpoint);
-    }
+       }
 
     public void setArmAngleRelative(double percentage) {
         double newAngleSetpoint = anglePID.getSetpoint() + percentage;
@@ -115,24 +112,12 @@ public class Arm extends SubsystemBase {
         double rawAngle = (armAngleEncoder.get() * 6);
         return rawAngle;
     }
+
+    public boolean isArmRetracted() {
+        return armExtensionRetractedSwitch.isPressed();
+    }
+
+    public void activateHomingProtocall() {
+        isHoming = true;
+    }
 }
-/*
- * Arm(){
- * SendableRegistry.addChild(m_robotArm, armAngle);
- * SendableRegistry.addChild(m_robotArm, armExtension);
- * SendableRegistry.addChild(m_robotArm, armRotation);
- * 
- * SparkMaxConfig armAngleConfig = new SparkMaxConfig();
- * SparkMaxConfig armExtensionConfig = new SparkMaxConfig();
- * SparkMaxConfig armRotationConfig = new SparkMaxConfig();
- * 
- * 
- * armAngle.configure(armAngleConfig, ResetMode.kResetSafeParameters,
- * PersistMode.kPersistParameters);
- * armExtension.configure(armExtensionConfig, ResetMode.kResetSafeParameters,
- * PersistMode.kPersistParameters);
- * armRotation.configure(armRotationConfig, ResetMode.kResetSafeParameters,
- * PersistMode.kPersistParameters);
- * }
- * PIDController.
- */
