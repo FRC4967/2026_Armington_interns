@@ -26,6 +26,7 @@ public class RobotContainer {
         joystick2.button(3).onTrue(new pickUpButton(arm, claw));
         joystick2.button(4).onTrue(new PlaceButton(arm, claw));
         joystick.button(6).onTrue(new ExtensionHoming(arm));
+        joystick.button(5).onTrue(new ResetEncoders(drivetrain));
     }
     
 }

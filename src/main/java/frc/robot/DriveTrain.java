@@ -40,20 +40,20 @@ public class DriveTrain extends SubsystemBase {
     SparkMaxConfig rightConfig = new SparkMaxConfig();
     SparkMaxConfig leftFollowConfig = new SparkMaxConfig();
     SparkMaxConfig rightFollowConfig = new SparkMaxConfig();
-
-    leftMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    rightMotor.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    leftMotorFollow.configure(leftFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    rightMotorFollow.configure(rightFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   
     leftEncoder = leftMotor.getEncoder();
-    rightEncoder = leftMotor.getEncoder();
+    rightEncoder = rightMotor.getEncoder();
     
     leftConfig.encoder.positionConversionFactor(WheelCircumference / GEAR_RATIO);
     rightConfig.encoder.positionConversionFactor(WheelCircumference / GEAR_RATIO);
     leftConfig.encoder.velocityConversionFactor(WheelCircumference / GEAR_RATIO / 60);
     rightConfig.encoder.velocityConversionFactor(WheelCircumference / GEAR_RATIO / 60);
-    
+
+    leftMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rightMotor.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    leftMotorFollow.configure(leftFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rightMotorFollow.configure(rightFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     rightConfig.inverted(true);
     rightFollowConfig.inverted(true);
 
@@ -76,5 +76,12 @@ public class DriveTrain extends SubsystemBase {
   @Override
     public void periodic() {
       SmartDashboard.putNumber("gyro", gyro.getAngle());
+      SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
+            SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
+    }
+
+    public void resetEncoders(){
+      leftEncoder.setPosition(0);
+      rightEncoder.setPosition(0);
     }
 }
