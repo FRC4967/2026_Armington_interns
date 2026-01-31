@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class DriveTrain extends SubsystemBase {
 
   private final RelativeEncoder leftEncoder;
-    private final RelativeEncoder rightEncoder;
+  private final RelativeEncoder rightEncoder;
   private final SparkMax leftMotor = new SparkMax(3, MotorType.kBrushless);
   private final SparkMax rightMotor = new SparkMax(1, MotorType.kBrushless);
   private final SparkMax leftMotorFollow = new SparkMax(4, MotorType.kBrushless);
