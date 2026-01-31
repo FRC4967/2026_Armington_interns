@@ -23,7 +23,7 @@ public class ResetButton extends Command{
         arm.extendTo(0);
         arm.setArmAngle(0);
     }
-
+    
     @Override
     public boolean isFinished() {
         return true;
