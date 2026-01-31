@@ -18,9 +18,9 @@ public class PlaceButton extends Command{
 
     @Override
     public void execute() {
-        claw.ClawGoTo(-27);
-        arm.extendTo(73);
-        arm.setArmAngle(150);
+        claw.ClawGoTo(7);
+        arm.extendTo(12);
+        arm.setArmAngle(71);
     }
     
     @Override
