@@ -27,23 +27,23 @@ public class DriveTrain extends SubsystemBase {
   private final AHRS gyro;
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(leftMotor::set, rightMotor::set);
 
-    public static final double TrackWidth = Units.inchesToMeters(22);
-    public static final double WheelRadius = Units.inchesToMeters(3); // meters
-    public static final double WheelCircumference = WheelRadius * 2 * Math.PI;
-    public static final double GEAR_RATIO = 10.71;
+  public static final double TrackWidth = Units.inchesToMeters(22);
+  public static final double WheelRadius = Units.inchesToMeters(3); // meters
+  public static final double WheelCircumference = WheelRadius * 2 * Math.PI;
+  public static final double GEAR_RATIO = 10.71;
 
-    DriveTrain(){
-        SendableRegistry.addChild(m_robotDrive, leftMotor);
+  DriveTrain() {
+    SendableRegistry.addChild(m_robotDrive, leftMotor);
     SendableRegistry.addChild(m_robotDrive, rightMotor);
 
     SparkMaxConfig leftConfig = new SparkMaxConfig();
     SparkMaxConfig rightConfig = new SparkMaxConfig();
     SparkMaxConfig leftFollowConfig = new SparkMaxConfig();
     SparkMaxConfig rightFollowConfig = new SparkMaxConfig();
-  
+
     leftEncoder = leftMotor.getEncoder();
     rightEncoder = rightMotor.getEncoder();
-    
+
     leftConfig.encoder.positionConversionFactor(WheelCircumference / GEAR_RATIO);
     rightConfig.encoder.positionConversionFactor(WheelCircumference / GEAR_RATIO);
     leftConfig.encoder.velocityConversionFactor(WheelCircumference / GEAR_RATIO / 60);
@@ -74,14 +74,14 @@ public class DriveTrain extends SubsystemBase {
   }
 
   @Override
-    public void periodic() {
-      SmartDashboard.putNumber("gyro", gyro.getAngle());
-      SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
-            SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
-    }
+  public void periodic() {
+    SmartDashboard.putNumber("gyro", gyro.getAngle());
+    SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
+    SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
+  }
 
-    public void resetEncoders(){
-      leftEncoder.setPosition(0);
-      rightEncoder.setPosition(0);
-    }
+  public void resetEncoders() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
 }

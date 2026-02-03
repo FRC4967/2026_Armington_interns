@@ -26,37 +26,36 @@ public class Claw extends SubsystemBase {
     }
 
     // public void runClaw(boolean up, boolean down) {
-    //     if (up == true) {
-    //         clawRotationMotor.setVoltage(1);
-    //     } else if (down == true) {
-    //         clawRotationMotor.setVoltage(-1);
-    //     } else {
-    //         clawRotationMotor.setVoltage();
-    //     }
+    // if (up == true) {
+    // clawRotationMotor.setVoltage(1);
+    // } else if (down == true) {
+    // clawRotationMotor.setVoltage(-1);
+    // } else {
+    // clawRotationMotor.setVoltage();
+    // }
     // }
     public void runClaw(boolean up, boolean down) {
-      if (up == true) {
-        clawSetpoint += 1;
-      }
-      else if (down == true) {
-        clawSetpoint -= 1;
-      } 
-      ClawGoTo(clawSetpoint);
-    } 
+        if (up == true) {
+            clawSetpoint += 1;
+        } else if (down == true) {
+            clawSetpoint -= 1;
+        }
+        ClawGoTo(clawSetpoint);
+    }
 
-    public void ClawGoTo(double position){
+    public void ClawGoTo(double position) {
         clawSetpoint = MathUtil.clamp(position, -62, 37);
         wristPid.setSetpoint(clawSetpoint);
     }
-    
+
     @Override
     public void periodic() {
-       SmartDashboard.putNumber("wristAngle", wristEncoder.getPosition());
+        SmartDashboard.putNumber("wristAngle", wristEncoder.getPosition());
 
-       if(RobotState.isEnabled()) {
+        if (RobotState.isEnabled()) {
             double clawVoltage = wristPid.calculate(wristEncoder.getPosition());
             clawRotationMotor.setVoltage(clawVoltage);
-       }
+        }
     }
-    
+
 }

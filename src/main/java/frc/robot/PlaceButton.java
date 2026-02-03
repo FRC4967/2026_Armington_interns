@@ -2,12 +2,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class PlaceButton extends Command{
-    
-    private final Arm arm; 
+public class PlaceButton extends Command {
+
+    private final Arm arm;
     private final Claw claw;
-    
-    
+
     public PlaceButton(Arm arm, Claw claw) {
         this.arm = arm;
         this.claw = claw;
@@ -15,18 +14,16 @@ public class PlaceButton extends Command{
         addRequirements(claw);
     }
 
-
     @Override
     public void execute() {
         claw.ClawGoTo(7);
         arm.extendTo(12);
         arm.setArmAngle(71);
     }
-    
+
     @Override
     public boolean isFinished() {
         return true;
     }
-
 
 }

@@ -34,6 +34,7 @@ public class Arm extends SubsystemBase {
     private final ArmFeedforward armFeedforward = new ArmFeedforward(0, .25, 0);
     private boolean isHoming = false;
     private double extensionSetpoint = 0;
+
     public Arm() {
         SparkMaxConfig armConfig = new SparkMaxConfig();
         SparkMaxConfig armAngleConfig = new SparkMaxConfig();
@@ -65,18 +66,19 @@ public class Arm extends SubsystemBase {
             double armAngleVoltage = MathUtil.clamp(armAngleFeedback + armGain, -12, 12);
             armAngle.setVoltage(armAngleVoltage);
             if (isHoming) {
-                if(armExtensionRetractedSwitch.isPressed()) {
+                if (armExtensionRetractedSwitch.isPressed()) {
                     armExtension.setVoltage(0);
                     isHoming = false;
                     armExtensionEncoder.setPosition(0);
                 } else {
-                     armExtension.setVoltage(-3);
+                    armExtension.setVoltage(-3);
                 }
             } else {
                 armExtension.setVoltage(armVoltage);
             }
         }
     }
+
     public void runExtension(boolean up, boolean down) {
         if (up) {
             extensionSetpoint += 1;
@@ -87,11 +89,11 @@ public class Arm extends SubsystemBase {
         }
     }
 
-       public void extendTo(double position) {
+    public void extendTo(double position) {
         double extensionSetpoint = position;
         extensionSetpoint = MathUtil.clamp(extensionSetpoint, 0, 250);
         extensionPID.setSetpoint(extensionSetpoint);
-       }
+    }
 
     public void setArmAngleRelative(double percentage) {
         double newAngleSetpoint = anglePID.getSetpoint() + percentage;
