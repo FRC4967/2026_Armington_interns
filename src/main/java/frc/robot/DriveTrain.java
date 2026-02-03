@@ -83,14 +83,30 @@ public class DriveTrain extends SubsystemBase {
   }
 
   @Override
-    public void periodic() {
-      SmartDashboard.putNumber("gyro", gyro.getAngle());
-      SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
-            SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
-    }
+  public void periodic() {
+    field.setRobotPose(odometry.getPoseMeters());
+    SmartDashboard.putNumber("gyro", gyro.getAngle());
+    SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
+    SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
+  }
 
-    public void resetEncoders(){
-      leftEncoder.setPosition(0);
-      rightEncoder.setPosition(0);
-    }
+  public void resetEncoders() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
+
+  public Double getHeading() {
+    return Math.IEEEremainder(gyro.getYaw(), 360);
+  }
+
+  public Rotation2d getGyro() {
+    return Rotation2d.fromDegrees(-getHeading());
+  }
+
+  public void updateOdometry() {
+    odometry.update(
+        getGyro(),
+        -leftEncoder.getPosition(),
+        -rightEncoder.getPosition());
+  }
 }
