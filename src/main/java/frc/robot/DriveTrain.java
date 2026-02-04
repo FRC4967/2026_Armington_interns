@@ -10,6 +10,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.util.Units;
@@ -97,6 +98,10 @@ public class DriveTrain extends SubsystemBase {
   public void resetEncoders() {
     leftEncoder.setPosition(0);
     rightEncoder.setPosition(0);
+  }
+
+  public void resetPose(Pose2d newPose) {
+    odometry.resetPose(newPose);
   }
 
   public Double getHeading() {
