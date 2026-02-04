@@ -76,6 +76,8 @@ public class DriveTrain extends SubsystemBase {
     odometry = new DifferentialDriveOdometry(new Rotation2d(gyro.getYaw()), leftEncoder.getPosition(),
         rightEncoder.getPosition());
 
+    SmartDashboard.putData("Field", field);
+
   }
 
   public void arcadeDrive(double forward_backwards, double right_left) {
@@ -84,10 +86,12 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateOdometry();
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putNumber("gyro", gyro.getAngle());
     SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
     SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
+    
   }
 
   public void resetEncoders() {
@@ -106,7 +110,7 @@ public class DriveTrain extends SubsystemBase {
   public void updateOdometry() {
     odometry.update(
         getGyro(),
-        -leftEncoder.getPosition(),
+        leftEncoder.getPosition(),
         -rightEncoder.getPosition());
   }
 }
